@@ -7,7 +7,7 @@ const routes = [
   {
     path: '/',
     name: 'home',
-    component:  () => import('../views/HomeView.vue'),
+    component: () => import('../views/HomeView.vue'),
     meta: {
       title: "首页"
     }
@@ -18,6 +18,14 @@ const routes = [
     component: () => import('../views/SimpleExampleView.vue'),
     meta: {
       title: "简单示例"
+    }
+  },
+  {
+    path: '/EffectComposerView',
+    name: 'EffectComposerView',
+    component: () => import('../views/EffectComposerView.vue'),
+    meta: {
+      title: "后期处理"
     }
   },
   {

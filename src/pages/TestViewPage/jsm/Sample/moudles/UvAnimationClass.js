@@ -14,12 +14,14 @@ class UvAnimationClass {
         const planeMaterial = new THREE.MeshLambertMaterial({
             color: 0x080631,
             transparent: true,
-            opacity: 0.8
+            opacity: 0.8,
+            side: THREE.DoubleSide,
         });
         const texLoader = new THREE.TextureLoader();
         this.ParameterConfig.Texture = texLoader.load(require('@/assets/img/tube.png'));
         const material = new THREE.MeshLambertMaterial({
             map: this.ParameterConfig.Texture,
+            side: THREE.DoubleSide,
         });
         this.ParameterConfig.Texture.wrapS = THREE.RepeatWrapping;
         this.ParameterConfig.Texture.repeat.x = 50;

@@ -22,6 +22,7 @@ class BoxGeometryClass {
         const cube = new THREE.Mesh(geometry, material);
         this.ParameterConfig.scene.add(cube);
         cube.position.x = x;
+        cube.position.z = 40;
         return cube;
     }
     AnimationFun() {

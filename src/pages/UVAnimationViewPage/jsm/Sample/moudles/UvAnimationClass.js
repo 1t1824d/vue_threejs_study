@@ -15,6 +15,7 @@ class UvAnimationClass {
         this.ParameterConfig.Texture = texLoader.load(require('@/assets/img/tube.png'));
         const material = new THREE.MeshLambertMaterial({
             map: this.ParameterConfig.Texture,
+            side: THREE.DoubleSide,
         });
         this.ParameterConfig.Texture.wrapS = THREE.RepeatWrapping;
         this.ParameterConfig.Texture.repeat.x = 50;

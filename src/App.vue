@@ -31,6 +31,13 @@ export default {
           }
         },
         {
+          path: '/EffectComposerView',
+          name: 'EffectComposerView',
+          meta: {
+            title: "后期处理"
+          }
+        },
+        {
           path: '/UVAnimation',
           name: 'UVAnimation',
           meta: {
