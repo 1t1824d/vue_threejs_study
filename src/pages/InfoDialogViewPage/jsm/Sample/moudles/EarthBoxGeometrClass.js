@@ -1,7 +1,35 @@
 class EarthBoxGeometrClass {
     constructor(ParameterConfig) {
         this.ParameterConfig = {
-            ...ParameterConfig
+            ...ParameterConfig,
+            areas: [{
+                name: "中国",
+                position: [116.20, 39.55]
+            }, {
+                name: "中非共和国",
+                position: [18.35, 4.23]
+            }, {
+                name: "智利",
+                position: [-70.40, -33.24]
+            }, {
+                name: "乍得",
+                position: [14.59, 12.10]
+            }, {
+                name: "赞比亚",
+                position: [28.16, -15.28]
+            }, {
+                name: "越南",
+                position: [105.55, 21.05]
+            }, {
+                name: "约旦",
+                position: [35.52, 31.57]
+            }, {
+                name: "维尔京群岛",
+                position: [-64.37, 18.27]
+            }, {
+                name: "英国",
+                position: [-0.05, 51.36]
+            }]
         }
         this.DrawFun()
 
@@ -26,7 +54,7 @@ class EarthBoxGeometrClass {
 
         this.ParameterConfig.GeometryBox = new THREE.Mesh(geometry, material);
         this.ParameterConfig.GeometryBox.name = "MyEarthBoxGeometrClass";
-        this.ParameterConfig.GeometryBox.position.set = (0,0,0)
+        this.ParameterConfig.GeometryBox.position.set = (0, 0, 0)
         this.ParameterConfig.scene.add(this.ParameterConfig.GeometryBox);
     }
     AnimationFun() {
