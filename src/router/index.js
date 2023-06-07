@@ -21,6 +21,13 @@ const routes = [
     }
   },
   {
+    path: '/InfoDialogView',
+    name: 'InfoDialogView',
+    component: () => import('../views/InfoDialogView.vue'),
+    meta: {
+      title: "信息弹框"
+    }
+  }, {
     path: '/EffectComposerView',
     name: 'EffectComposerView',
     component: () => import('../views/EffectComposerView.vue'),

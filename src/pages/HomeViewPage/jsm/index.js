@@ -25,6 +25,7 @@ class DrawThreeJsClass {
             alpha: true,
             preserveDrawingBuffer: true,
             logarithmicDepthBuffer: true,// 设置对数深度缓冲区，优化深度冲突问题
+           // logarithmicDepthBuffer: false, //如果要在单个场景中处理巨大的比例差异，就有必要使用。此处要用false，否则文字标签不显示
         });
         this.ParameterConfig.renderer.setSize(WBGLCanvasWidth, WBGLCanvasHeight);
         this.ParameterConfig.renderer.setPixelRatio(window.devicePixelRatio);

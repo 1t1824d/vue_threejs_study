@@ -33,6 +33,13 @@ export default {
           }
         },
         {
+          path: '/InfoDialogView',
+          name: 'InfoDialogView',
+          meta: {
+            title: "信息弹框"
+          }
+        },
+        {
           path: '/EffectComposerView',
           name: 'EffectComposerView',
           meta: {
