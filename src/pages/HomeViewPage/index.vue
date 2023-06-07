@@ -1,5 +1,6 @@
 <template>
     <div class="HomeViewPage">
+        <el-button @click="()=>{this.InitDrawThreeJsClass.dispose()}">销毁</el-button>
         <div class="HomeViewPageOutbox">
             <div class="mythreedemojsdiv" ref="MyThreeJsContainer">
             </div>

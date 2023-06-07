@@ -5,6 +5,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import { LightClass } from './Light/index'
 import { UvAnimationClass, BoxGeometryClass } from './Sample/index'
+import { EffectComposerClass } from "./EffectComposer/index";
 class DrawThreeJsClass {
     constructor(ThreeJsContainer) {
         this.ThreeJsContainer = ThreeJsContainer
@@ -136,6 +137,9 @@ class DrawThreeJsClass {
             this.DblclickFullscreenFun()
             this.ParameterConfig.InitUvAnimationClass = new UvAnimationClass(this.ParameterConfig)
             this.ParameterConfig.InitBoxGeometryClass = new BoxGeometryClass(this.ParameterConfig)
+        //////// 后期处理 ///////////
+        this.ParameterConfig.EffectComposerClass = new EffectComposerClass(this.ParameterConfig)
+        ///////////////////////////
         }
         return this
     }
@@ -148,6 +152,9 @@ class DrawThreeJsClass {
         this.ParameterConfig.RequestAnimationFrameVal = requestAnimationFrame(() => {
             this.UpdateFun()
         })
+           ////////////// 后期处理 /////////////
+           this.ParameterConfig.EffectComposerClass.AnimationFun()
+           ////////////////////////////////
     }
     //取消动画
     CancelAnimationFun() {
@@ -176,6 +183,7 @@ class DrawThreeJsClass {
         //更新渲染器宽度和高度
         this.ParameterConfig.renderer.setSize(this.ParameterConfig.WBGLCanvasWidth, this.ParameterConfig.WBGLCanvasHeight)
         console.log("画面变化了")
+        this.ParameterConfig.EffectComposerClass.WindowResizeResetViewFun()
     }
     //画布全屏
     DblclickFullscreenFun() {
