@@ -6,7 +6,9 @@
       </nav>
     </div>
     <div class="RouterViewOutbox">
-      <router-view />
+      <keep-alive>
+        <router-view />
+      </keep-alive>
     </div>
   </div>
 </template>

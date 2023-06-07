@@ -9,7 +9,7 @@ import { EffectComposerClass } from "./EffectComposer/index";
 class DrawThreeJsClass {
     constructor(ThreeJsContainer) {
         this.ThreeJsContainer = ThreeJsContainer
-        this.ParameterConfig = { ThreeJsContainer, RequestAnimationFrameVal: null }
+        this.ParameterConfig = { ThreeJsContainer, RequestAnimationFrameVal: null, clock: new THREE.Clock()  }
         this.DrawThreeJsFun()
     }
     DrawThreeJsFun() {

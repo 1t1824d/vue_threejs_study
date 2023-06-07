@@ -5,6 +5,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import { LightClass } from './Light/index'
 import { UvAnimationClass, BoxGeometryClass } from './Sample/index'
+import { debounce, ScreenTransToThreeCoord, ThreeTransToScreenCoord, GetXYToCanvas } from './uitls/index'
 ///////////
 // 引入后处理扩展库EffectComposer.js
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js"
@@ -219,13 +220,9 @@ class DrawThreeJsClass {
     }
     //////////////////////////////
     ClickEvent(event) {
-        //获取在射线上的接触点
-        //获取鼠标坐标
-        let mouse = new THREE.Vector2();
+        let canvasDom = this.ParameterConfig.renderer.domElement
+        let mouse = ScreenTransToThreeCoord(canvasDom, event, new THREE.Vector2())
         let raycaster = new THREE.Raycaster();
-        mouse.x = (event.clientX / this.ParameterConfig.WBGLCanvasWidth) * 2 - 1;
-        mouse.y = -(event.clientY / this.ParameterConfig.WBGLCanvasHeight) * 2 + 1;
-
         raycaster.setFromCamera(mouse, this.ParameterConfig.camera);
         let intersects = raycaster.intersectObjects(this.ParameterConfig.scene.children);
         console.log(`intersects `, intersects)
