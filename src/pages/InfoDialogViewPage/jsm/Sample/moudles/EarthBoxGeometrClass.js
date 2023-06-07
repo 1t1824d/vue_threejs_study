@@ -38,10 +38,13 @@ class EarthBoxGeometrClass {
     }
     DrawFun() {
         this.CreateGeometry().CreateAreaPoint().AddToSeneFun()
+        window.addEventListener('click', (event) => {
+            this.clickMouse(event)
+        }, false);
     }
     AddToSeneFun() {
         this.ParameterConfig.scene.add(this.ParameterConfig.Group);
-       // this.ParameterConfig.scene.Group.scale(0.2, 0.2, 0.2);
+        // this.ParameterConfig.scene.Group.scale(0.2, 0.2, 0.2);
     }
     CreateGeometry() {
         this.ParameterConfig.Group = new Group()
@@ -154,6 +157,8 @@ class EarthBoxGeometrClass {
     CreateTxt(position, name) {
         var texture = new THREE.CanvasTexture(getCanvasFont());
         var fontMesh = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture }));
+        /***设置mesh的name属性，用于鼠标点击标签弹出对应的名称***/
+        fontMesh.name = name;
         // 放大
         fontMesh.scale.x = 10;
         fontMesh.scale.y = 5;
@@ -186,6 +191,77 @@ class EarthBoxGeometrClass {
     AnimationFun() {
 
     }
+
+    // 鼠标点击标记的事件
+    clickMouse(event) {
+        event.preventDefault();
+        console.log(`1233`, 1233);
+        let raycaster = new THREE.Raycaster();
+        let mouse = new THREE.Vector2();
+        let dom = this.ParameterConfig.renderer.domElement
+        // 通过鼠标点击位置,计算出 raycaster 所点的位置,以屏幕为中心点,范围 -1 到 1
+        let getBoundingClientRect = dom.getBoundingClientRect();
+        mouse.x = ((event.clientX - getBoundingClientRect.left) / dom.offsetWidth) * 2 - 1;
+        mouse.y = -((event.clientY - getBoundingClientRect.top) / dom.offsetHeight) * 2 + 1;
+
+        //通过鼠标点击的位置(二维坐标)和当前相机的矩阵计算出射线位置
+        raycaster.setFromCamera(mouse, this.ParameterConfig.camera);
+
+        // 获取与射线相交的对象数组，其中的元素按照距离排序，越近的越靠前
+        let intersects = raycaster.intersectObjects(this.ParameterConfig.scene.children);
+
+        this.deleteDiv(); //调用清除弹窗函数
+
+        // 获取点击对象的值
+        for (let i = 0; i < intersects.length; i++) {
+            if (intersects[i].object.type == 'Sprite') {
+                let countryName = intersects[i].object.name; // 国家						
+                let V3 = intersects[i].object.position; // 三维坐标	
+                console.log(`intersects[i].object`, intersects[i].object);
+                if (countryName != '') {
+                    console.log(`countryName`, countryName);
+                    this.divPop(countryName, V3); //调用弹窗函数							
+                }
+            }
+        }
+    }
+
+    // 弹窗内容与样式	
+    divPop(countryName, V3) {
+        let rs = this.WorldToScreen(V3.x, V3.y, V3.z); // 调用世界坐标转屏幕坐标函数								
+        let div = document.createElement("divCell"); //创建一个div				    
+        div.id = "divCell";  //设置ID
+        div.innerHTML = countryName; //div的内容  
+        div.style.padding = '5px';
+        div.style.position = 'absolute';
+        div.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+        div.style.left = rs.x + "px";
+        div.style.top = rs.y + "px";
+        this.ParameterConfig.ThreeJsContainer.appendChild(div); //添加到页面 
+    }
+
+    // 清除弹窗
+    deleteDiv() {
+        //如果原来有“divCell”这个图层，先删除这个图层
+        let d = document.getElementById("divCell");
+        if (d != null) {
+            d.parentNode.removeChild(d);
+        }
+    }
+
+    // 世界坐标转屏幕坐标
+    WorldToScreen(x, y, z) {
+        let worldVector = new THREE.Vector3(x, y, z);
+        let vector = worldVector.project(this.ParameterConfig.camera); //世界坐标转标准设备坐标
+        let w = this.ParameterConfig.WBGLCanvasWidth / 2;
+        let h = this.ParameterConfig.WBGLCanvasHeight / 2;
+        return {
+            x: Math.round(vector.x * w + w),
+            y: Math.round(-vector.y * h + h)
+        }
+    }
+
+
 
 }
 export { EarthBoxGeometrClass }
