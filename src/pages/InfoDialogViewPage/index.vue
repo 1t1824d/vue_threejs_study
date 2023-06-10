@@ -1,10 +1,11 @@
 <template>
     <div class="InfoDialogViewPage">
-        <el-button @click="()=>{this.InitDrawThreeJsClass.dispose()}">销毁</el-button>
+        <el-button @click="() => { this.InitDrawThreeJsClass.dispose() }">销毁</el-button>
         <div class="InfoDialogViewPageOutbox">
             <div class="mythreedemojsdiv" ref="MyThreeJsContainer">
             </div>
         </div>
+        <img :src="itemImg(Theme, ImgName)" alt="">
     </div>
 </template>
 <script>
@@ -14,7 +15,16 @@ export default {
     data() {
         return {
             MyThreeJsContainer: null,
-            InitDrawThreeJsClass: null
+            InitDrawThreeJsClass: null,
+            Theme:"",
+            ImgName:"logo.png"
+        }
+    },
+    computed: {
+        itemImg() {
+            return (item, imgName) => {
+                return require(`@/assets/img/${item}${imgName}`)
+            }
         }
     },
     beforeDestroy() {
@@ -30,6 +40,9 @@ export default {
         })
     },
     methods: {
+        DomRequireImg(src) {
+            return require(src)
+        },
         Draw() {
             this.MyThreeJsContainer = this.$refs.MyThreeJsContainer
             this.InitDrawThreeJsClass = new DrawThreeJsClass(this.MyThreeJsContainer)
@@ -41,7 +54,7 @@ export default {
                 this.InitDrawThreeJsClass.ParameterConfig.WBGLCanvasWidth = this.MyThreeJsContainer.getBoundingClientRect().width
                 this.InitDrawThreeJsClass.ParameterConfig.WBGLCanvasHeight = this.MyThreeJsContainer.getBoundingClientRect().height
                 this.InitDrawThreeJsClass.WindowResizeResetViewFun()
-             
+
             })
         },
     }
