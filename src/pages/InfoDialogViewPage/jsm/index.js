@@ -80,7 +80,7 @@ class DrawThreeJsClass {
         this.CreateLight()
         this.CreateControls()
         this.CreateStats()
-    this.GridHelperFun()
+        // this.GridHelperFun()
         return this
     }
     // 创建光源
