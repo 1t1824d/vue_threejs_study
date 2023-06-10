@@ -92,21 +92,10 @@ class DrawThreeJsClass {
         //控制器 第一个参数是相机第二个参数是渲染器 加载场景控制插件
         let controls = new OrbitControls(this.ParameterConfig.camera, this.ParameterConfig.renderer.domElement);
         controls.autoRotate = true // 是否自动旋转
-        // controls.enablePan = true // 是否开启右键拖拽
-        // controls.maxPolarAngle = 1.5 // 上下翻转的最大角度
-        // controls.minPolarAngle = 0.0 // 上下翻转的最小角度
-        // // controls.enableZoom = false // 是否可以缩放 默认是true
-        // controls.dampingFactor = 0.5 // 动态阻尼系数 就是鼠标拖拽旋转灵敏度，阻尼越小越灵敏
-        // controls.enableDamping = true;
-        // controls.autoRotateSpeed = 0.3;
-        // controls.enableKeys = true;
-        // controls.keyPanSpeed = 7;
-        // controls.keys = {
-        //     LEFT: 37,
-        //     UP: 38,
-        //     RIGHT: 39,
-        //     BOTTOM: 0
-        // }
+        controls.maxPolarAngle = Math.PI * 0.495;
+        controls.target.set(0, 10, 0);
+        controls.minDistance = 40.0;
+        controls.maxDistance = 200.0;
         this.ParameterConfig.controls = controls;
 
     }
