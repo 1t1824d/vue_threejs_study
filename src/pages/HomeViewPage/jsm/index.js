@@ -118,6 +118,10 @@ class DrawThreeJsClass {
         this.ParameterConfig.scene.add(this.ParameterConfig.axesHelper);
         // 创建地面网格辅助
         this.ParameterConfig.gridHelper = new THREE.GridHelper(this.ParameterConfig.WBGLCanvasWidth, 60, 'red', 'rgb(222, 225, 230)')
+        this.ParameterConfig.gridHelper.material.opacity = 0.5;
+        this.ParameterConfig.gridHelper.material.depthWrite = false;
+        this.ParameterConfig.gridHelper.material.transparent = true;
+        this.ParameterConfig.gridHelper.position.y = 0;
         this.ParameterConfig.scene.add(this.ParameterConfig.gridHelper);
     }
     // 渲染所有绘制图形方法
