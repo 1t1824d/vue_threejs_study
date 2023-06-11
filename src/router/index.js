@@ -21,6 +21,21 @@ const routes = [
     }
   },
   {
+    path: '/SkyBoxView',
+    name: 'SkyBoxView',
+    component: () => import('../views/SkyBoxView.vue'),
+    meta: {
+      title: "天空盒"
+    }
+  },{
+    path: '/VideoTextureView',
+    name: 'VideoTextureView',
+    component: () => import('../views/VideoTextureView.vue'),
+    meta: {
+      title: "视频贴图"
+    }
+  },
+  {
     path: '/InfoDialogView',
     name: 'InfoDialogView',
     component: () => import('../views/InfoDialogView.vue'),

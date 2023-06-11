@@ -33,6 +33,19 @@ export default {
           }
         },
         {
+          path: '/SkyBoxView',
+          name: 'SkyBoxView',
+          meta: {
+            title: "天空盒"
+          }
+        }, {
+          path: '/VideoTextureView',
+          name: 'VideoTextureView',
+          meta: {
+            title: "视频贴图"
+          }
+        },
+        {
           path: '/InfoDialogView',
           name: 'InfoDialogView',
           meta: {
