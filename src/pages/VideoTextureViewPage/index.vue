@@ -2,7 +2,7 @@
   <div class="VideoTextureViewPage">
     <video src="./video/sintel.mp4" id="video" autoplay loop style="display:none">
     </video>
-    <div class="Container" ref="ContainerRef"></div>
+    <div id="container"></div>
   </div>
 </template>
   
@@ -14,12 +14,7 @@ export default {
   name: "VideoTextureViewPage",
   data() {
     return {
-      renderer: null,
-      scene: null,
-      camera: null,
-      orbit: null,
-      control: null,
-      videoTexture: null,
+    
     }
   },
   mounted() {
@@ -29,80 +24,118 @@ export default {
   },
   methods: {
     InitFun() {
-      let ContainerRefDiv = this.$refs.ContainerRef
-      let Width = ContainerRefDiv.getBoundingClientRect().width
-      let Height = ContainerRefDiv.getBoundingClientRect().height
-      console.log("ContainerRefDiv", ContainerRefDiv);
-      console.log("ContainerRefDiv-getClientRects()", ContainerRefDiv.getClientRects());
-      console.log("ContainerRefDiv--getBoundingClientRect()", ContainerRefDiv.getBoundingClientRect());
-      var video = document.getElementById('video');
-      this.videoTexture = new THREE.Texture(video);
-      this.videoTexture.minFilter = THREE.LinearFilter;
-      this.videoTexture.magFilter = THREE.LinearFilter;
-      this.videoTexture.format = THREE.RGBFormat;
-      this.videoTexture.generateMipmaps = false;
-      this.scene = new THREE.Scene();
-      this.camera = new THREE.PerspectiveCamera(45, Width / Height, 0.1, 1000);
-    
-      this.renderer = new THREE.WebGLRenderer();
-      this.renderer.setClearColor(0xcccccc, 1.0);
-      this.renderer.setSize(Width, Height);
-      ContainerRefDiv.appendChild(this.renderer.domElement);
-      this.orbit = new OrbitControls(this.camera, this.renderer.domElement);
-      /////
-      var cubeGeometry = new THREE.BoxGeometry(1, 10, 20);
-      var cubeMaterial = new THREE.MeshBasicMaterial({ map: this.videoTexture });
-    
-      var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-      cube.position.set(-10.05, 0, 0);
-      cube.rotation.x = -0.3;
-      cube.rotation.y = 23.5;
-      cube.name = 'cube';
-      this.scene.add(cube);
+      let camera, scene, renderer;
 
-      var cubetwoGeometry = new THREE.BoxGeometry(1, 10, 20);
-      var cubetwoMaterial = new THREE.MeshBasicMaterial({ map: this.videoTexture });
-     
-      var cubetwo = new THREE.Mesh(cubetwoGeometry,cubetwoMaterial);
-      cubetwo.position.set(10.05, 0, 0);
-      cubetwo.rotation.x = -0.3;
-      cubetwo.rotation.y = 23.5;
-      this.scene.add(cubetwo);
-      var dirLightLeft = new THREE.DirectionalLight();
-      dirLightLeft.position.set(15, 20, 20);
-      this.scene.add(dirLightLeft);
+      let isUserInteracting = false,
+        lon = 0, lat = 0,
+        phi = 0, theta = 0,
+        onPointerDownPointerX = 0,
+        onPointerDownPointerY = 0,
+        onPointerDownLon = 0,
+        onPointerDownLat = 0;
 
-      var dirLightRight = new THREE.DirectionalLight();
-      dirLightRight.position.set(-15, 20, 20);
-      this.scene.add(dirLightRight);
-      this.camera.position.x = 0;
-      this.camera.position.y = 12;
-      this.camera.position.z = 30;
-      this.camera.lookAt(this.scene.position);
+      const distance = 50;
 
-      this.control = () => {
-        //this.rotationSpeed = 0.005;
-        this.scale = 1;
-      };
-     //addControls(this.control);
-  
-      function addControls(controlObject) {
-        var gui = new GUI();
-        gui.add(controlObject, 'scale', 0.01, 5);
+      init();
+      animate();
+
+      function init() {
+
+        const container = document.getElementById('container');
+
+        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1100);
+
+        scene = new THREE.Scene();
+
+        const geometry = new THREE.SphereGeometry(500, 60, 40);
+        // invert the geometry on the x-axis so that all of the faces point inward
+        geometry.scale(- 1, 1, 1);
+
+        const video = document.getElementById('video');
+        video.play();
+
+        const texture = new THREE.VideoTexture(video);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        const material = new THREE.MeshBasicMaterial({ map: texture });
+
+        const mesh = new THREE.Mesh(geometry, material);
+        scene.add(mesh);
+
+        renderer = new THREE.WebGLRenderer();
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        container.appendChild(renderer.domElement);
+
+        document.addEventListener('pointerdown', onPointerDown);
+        document.addEventListener('pointermove', onPointerMove);
+        document.addEventListener('pointerup', onPointerUp);
+
+        //
+
+        window.addEventListener('resize', onWindowResize);
+
       }
 
-     let render=()=> {
-      this.renderer.render(this.scene, this.camera);
-        //scene.getObjectByName('cube').rotation.y += control.rotationSpeed;
-        this.scene.getObjectByName('cube').scale.set(this.control.scale, this.control.scale, this.control.scale);
+      function onWindowResize() {
 
-        this.videoTexture.needsUpdate = true;
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
 
-        requestAnimationFrame(()=>{
-          render
-        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
       }
-      render();
+
+      function onPointerDown(event) {
+
+        isUserInteracting = true;
+
+        onPointerDownPointerX = event.clientX;
+        onPointerDownPointerY = event.clientY;
+
+        onPointerDownLon = lon;
+        onPointerDownLat = lat;
+
+      }
+
+      function onPointerMove(event) {
+
+        if (isUserInteracting === true) {
+
+          lon = (onPointerDownPointerX - event.clientX) * 0.1 + onPointerDownLon;
+          lat = (onPointerDownPointerY - event.clientY) * 0.1 + onPointerDownLat;
+
+        }
+
+      }
+
+      function onPointerUp() {
+
+        isUserInteracting = false;
+
+      }
+
+      function animate() {
+
+        requestAnimationFrame(animate);
+        update();
+
+      }
+
+      function update() {
+
+        lat = Math.max(- 85, Math.min(85, lat));
+        phi = THREE.MathUtils.degToRad(90 - lat);
+        theta = THREE.MathUtils.degToRad(lon);
+
+        camera.position.x = distance * Math.sin(phi) * Math.cos(theta);
+        camera.position.y = distance * Math.cos(phi);
+        camera.position.z = distance * Math.sin(phi) * Math.sin(theta);
+
+        camera.lookAt(0, 0, 0);
+
+        renderer.render(scene, camera);
+
+      }
     }
   }
 }
@@ -113,7 +146,7 @@ export default {
   width: 100%;
   height: 100%;
 
-  .Container {
+  #container {
     width: 100%;
     height: 100%;
   }
