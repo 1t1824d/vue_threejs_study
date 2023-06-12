@@ -21,13 +21,21 @@ const routes = [
     }
   },
   {
+    path: '/Model',
+    name: 'Model',
+    component: () => import('../views/ModelView.vue'),
+    meta: {
+      title: "模型"
+    }
+  },
+  {
     path: '/SkyBoxView',
     name: 'SkyBoxView',
     component: () => import('../views/SkyBoxView.vue'),
     meta: {
       title: "天空盒"
     }
-  },{
+  }, {
     path: '/VideoTextureView',
     name: 'VideoTextureView',
     component: () => import('../views/VideoTextureView.vue'),

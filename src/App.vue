@@ -33,6 +33,13 @@ export default {
           }
         },
         {
+          path: '/Model',
+          name: 'Model',
+          meta: {
+            title: "模型"
+          }
+        },
+        {
           path: '/SkyBoxView',
           name: 'SkyBoxView',
           meta: {
