@@ -143,10 +143,97 @@ class DrawThreeJsClass {
         this.ParameterConfig.gridHelper.position.y = 0;
         this.ParameterConfig.scene.add(this.ParameterConfig.gridHelper);
     }
+    //变换控制器
     CreateTransformControls() {
+        // 初始化射线发射器
+        let raycaster = new THREE.Raycaster()
         // 初始化变换控制器
         let transformControls = new TransformControls(this.ParameterConfig.camera, this.ParameterConfig.renderer.domElement)
         this.ParameterConfig.scene.add(transformControls) // 将变换控制器添加至场景
+        let transing = false
+        transformControls.addEventListener("mouseDown", event => {
+            transing = true
+        })
+        // 初始化鼠标位置
+        let mouse = new THREE.Vector2()
+        let x = 0; let y = 0; let width = 0; let height = 0
+
+        this.ParameterConfig.renderer.domElement.addEventListener("mousemove", event => {
+            x = event.offsetX
+            y = event.offsetY
+            width = this.ParameterConfig.renderer.domElement.offsetWidth
+            height = this.ParameterConfig.renderer.domElement.offsetHeight
+            mouse.x = x / width * 2 - 1
+            mouse.y = -y * 2 / height + 1
+
+            raycaster.setFromCamera(mouse, this.ParameterConfig.camera)  // 配置射线发射器
+            this.ParameterConfig.scene.remove(transformControls)  // 移除变换控制器
+            const intersection = raycaster.intersectObjects(this.ParameterConfig.scene.children)
+            if (intersection.length) {
+                const object = intersection[0].object
+                if (object !== this.cacheObject) {  // 如果当前物体不等于缓存的物体
+                    if (this.cacheObject) { // 如果有缓存物体先执行之前物体的离开事件
+                        this.cacheObject.dispatchEvent({
+                            type: 'mouseleave'
+                        })
+                    }
+                    object.dispatchEvent({  // 添加当前物体进入事件
+                        type: 'mouseenter'
+                    })
+                } else if (object === this.cacheObject) {  // 如果当前物体等于缓存的物体
+                    object.dispatchEvent({  // 执行移动事件
+                        type: 'mousemove'
+                    })
+                }
+                this.cacheObject = object
+            } else {
+                if (this.cacheObject) {  // 如果有缓存物体就先执行离开事件
+                    this.cacheObject.dispatchEvent({
+                        type: 'mouseleave'
+                    })
+                }
+                this.cacheObject = null
+            }
+        })
+
+        // 点击事件
+        this.ParameterConfig.renderer.domElement.addEventListener("click", event => {
+            if (transing) {
+                transing = false
+                return
+            }
+            this.ParameterConfig.scene.remove(transformControls) // 移除变换控制器
+            transformControls.enabled = false // 停用变换控制器
+            raycaster.setFromCamera(mouse, this.ParameterConfig.camera)  // 配置射线发射器，传递鼠标和相机对象
+            const intersection = raycaster.intersectObjects(this.ParameterConfig.scene.children) // 获取射线发射器捕获的模型列表，传进去场景中所以模型，穿透的会返回我们
+            if (intersection.length) {
+                const object = intersection[0].object  // 获取第一个模型
+                this.ParameterConfig.scene.add(transformControls) // 添加变换控制器
+                transformControls.enabled = true // 启用变换控制器
+                transformControls.attach(object)
+            }
+        })
+
+
+        // 监听变换控制器模式更改
+        document.addEventListener("keyup", event => {
+            if (transformControls.enabled) {  // 变换控制器为启用状态执行
+                if (event.key === 'e') { // 鼠标按下e键，模式改为缩放
+                    transformControls.mode = 'scale'
+                    return false
+                }
+                if (event.key === 'r') { // 鼠标按下r键，模式改为旋转
+                    transformControls.mode = 'rotate'
+                    return false
+                }
+                if (event.key === 't') { // 鼠标按下t键，模式改为平移
+                    transformControls.mode = 'translate'
+                    return false
+                }
+            }
+        })
+
+
 
     }
     // 渲染所有绘制图形方法
