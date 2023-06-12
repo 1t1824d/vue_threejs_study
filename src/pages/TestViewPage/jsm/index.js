@@ -3,6 +3,7 @@ import * as THREE from 'three';
 window.THREE = THREE
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import Stats from 'three/examples/jsm/libs/stats.module.js';
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls'
 import { LightClass } from './Light/index'
 import { UvAnimationClass, BoxGeometryClass } from './Sample/index'
 import { debounce, ScreenTransToThreeCoord, ThreeTransToScreenCoord, GetXYToCanvas } from './uitls/index'
@@ -98,6 +99,7 @@ class DrawThreeJsClass {
         this.CreateControls()
         this.CreateStats()
         this.GridHelperFun()
+        this.CreateTransformControls()
         return this
     }
     // 创建光源
@@ -140,6 +142,12 @@ class DrawThreeJsClass {
         this.ParameterConfig.gridHelper.material.transparent = true;
         this.ParameterConfig.gridHelper.position.y = 0;
         this.ParameterConfig.scene.add(this.ParameterConfig.gridHelper);
+    }
+    CreateTransformControls() {
+        // 初始化变换控制器
+        let transformControls = new TransformControls(this.ParameterConfig.camera, this.ParameterConfig.renderer.domElement)
+        this.ParameterConfig.scene.add(transformControls) // 将变换控制器添加至场景
+
     }
     // 渲染所有绘制图形方法
     AllDrawGeometryFun() {
