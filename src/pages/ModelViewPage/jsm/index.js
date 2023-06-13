@@ -273,6 +273,7 @@ class DrawThreeJsClass {
             this.UpdateFun()
         })
         // this.ParameterConfig.InitUvAnimationClass.AnimationFun()
+        this.ParameterConfig.InitModelClass.AnimationFun()
         this.ParameterConfig.controls.update();
         this.ParameterConfig.stats.update();
         this.ParameterConfig.renderer.render(this.ParameterConfig.scene, this.ParameterConfig.camera);

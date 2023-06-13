@@ -1,5 +1,6 @@
 
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
 class ModelClass {
     constructor(ParameterConfig) {
         this.ParameterConfig = {
@@ -23,46 +24,76 @@ class ModelClass {
         this.ParameterConfig.Group = new THREE.Group();
         this.ParameterConfig.Group.position.set(0, 0, 0);
         this.ParameterConfig.scene.add(this.ParameterConfig.Group);
-        // this.loadGLTF(); // 加载GLTF模型
+        //this.loadGLTF(); // 加载GLTF模型
         //this.loadGLTF2()
-        this.loadGLTF3()
+        // this.loadGLTF3()
+        this.load3D()
     }
     // 加载GLTF模型
     loadGLTF() {
-        let promiseVal = new Promise((resolve, reject) => {
-            let loader = new GLTFLoader();
-            loader.load(
-                "model/shuichang.glb",
-                (model) => {
-                    resolve(model)
-                    reject("model加载失败!")
-                }
-            );
-        })
-        //加载成功
-        promiseVal.then((model) => {
-            console.log(`加载GLTF模型1--model`, model);
-            console.log(`加载GLTF模型1--model.scene`, model.scene);
-            let object = model.scene;
-            object.receiveShadow = true;
-            object.traverse((item) => {
-                if (item instanceof THREE.Mesh) {
-                    // item.material.color.set(0x1DA9FC);
-                    // item.material.transparent = true;
-                    // item.material.opacity = 0.5;
-                    this.shaderObj(item);
-                }
+        ////
+        const loader = new GLTFLoader();
+        const modelLoaded = loader
+            .loadAsync("model/shuichang.glb", (xhr) => {
+                console.log(`xhr`, xhr);
+                console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+            })
+            .then((model) => {
+                console.log(`加载GLTF模型1--model`, model);
+                console.log(`加载GLTF模型1--model.scene`, model.scene);
+                let object = model.scene;
+                object.receiveShadow = true;
+                object.traverse((item) => {
+                    if (item instanceof THREE.Mesh) {
+                        // item.material.color.set(0x1DA9FC);
+                        // item.material.transparent = true;
+                        // item.material.opacity = 0.5;
+                        this.shaderObj(item);
+                    }
+                });
+                object.scale.set(1.5, 1.5, 1.5);
+                object.rotateY(Math.PI);
+                object.position.set(0, 0, 30);
+                object.name = "MyGltfClass1";
+                this.ParameterConfig.Group.add(object);
+            })
+            .catch((error) => {
+                console.error(error);
             });
-            object.scale.set(1.5, 1.5, 1.5);
-            object.rotateY(Math.PI);
-            object.position.set(0, 0, 30);
-            object.name = "MyGltfClass1";
-            this.ParameterConfig.Group.add(object);
-        })
-        //加载失败
-        promiseVal.catch((err) => {
-            console.log(err);
-        });
+        // let promiseVal = new Promise((resolve, reject) => {
+        //     let loader = new GLTFLoader();
+        //     loader.load(
+        //         "model/shuichang.glb",
+        //         (model) => {
+        //             resolve(model)
+        //             reject("model加载失败!")
+        //         }
+        //     );
+        // })
+        // //加载成功
+        // promiseVal.then((model) => {
+        //     console.log(`加载GLTF模型1--model`, model);
+        //     console.log(`加载GLTF模型1--model.scene`, model.scene);
+        //     let object = model.scene;
+        //     object.receiveShadow = true;
+        //     object.traverse((item) => {
+        //         if (item instanceof THREE.Mesh) {
+        //             // item.material.color.set(0x1DA9FC);
+        //             // item.material.transparent = true;
+        //             // item.material.opacity = 0.5;
+        //             this.shaderObj(item);
+        //         }
+        //     });
+        //     object.scale.set(1.5, 1.5, 1.5);
+        //     object.rotateY(Math.PI);
+        //     object.position.set(0, 0, 30);
+        //     object.name = "MyGltfClass1";
+        //     this.ParameterConfig.Group.add(object);
+        // })
+        // //加载失败
+        // promiseVal.catch((err) => {
+        //     console.log(err);
+        // });
     }
     shaderObj(selectedObjects) {
         let vertexShader = ` ${THREE.ShaderChunk.logdepthbuf_pars_vertex}
@@ -168,6 +199,7 @@ class ModelClass {
                 }
             });
             this.ParameterConfig.Group.add(object);
+
         })
         //加载失败
         promiseVal.catch((err) => {
@@ -222,27 +254,78 @@ class ModelClass {
                 console.error(error);
             });
     }
+    load3D() {
+        const loader = new GLTFLoader()
+        const dracoLoader = new DRACOLoader()
+        dracoLoader.setDecoderPath('https://threejs.org/examples/jsm/libs/draco/')
+        dracoLoader.preload()
+        loader.setDRACOLoader(dracoLoader)
+
+        loader.load('https://threejs.org/examples/models/gltf/LittlestTokyo.glb', (gltf) => {
+            gltf.scene.scale.set(0.1, 0.1, 0.1);
+            gltf.scene.castShadow = true
+            gltf.scene.receiveShadow = true
+            gltf.scene.name = "加载在线模型";
+            gltf.scene.traverse((item) => {
+                if (item instanceof THREE.Mesh) {
+                    // item.material.color.set(0x1DA9FC);
+                    // item.material.transparent = true;
+                    // item.material.opacity = 0.5;
+                    console.log(`item`, item);
+                    this.shaderObj(item);
+                }
+            });
+            this.ParameterConfig.scene.add(gltf.scene)
+        }, (xhr) => {
+            console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+        }, (error) => {
+            console.error(error)
+        })
+    }
+    WaterTextureFun() {
+        new THREE.TextureLoader().loadAsync(require('@/assets/img/waternormals.jpg')).then((waterNormals) => {
+            waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping;
+            this.ParameterConfig.water = new THREE.Water(new THREE.PlaneGeometry(1000, 1000), {
+                textureWidth: 512,
+                textureHeight: 512,
+                waterNormals,
+                sunDirection: new THREE.Vector3(),
+                sunColor: 0xffffff,
+                waterColor: 0x001e0f,
+                distortionScale: 3.7,
+                fog: !!this.ParameterConfig.scene.fog,
+            });
+            this.ParameterConfig.water.position.y = 0;
+            this.ParameterConfig.water.position.x = -200;
+            this.ParameterConfig.water.rotation.x = Math.PI * -0.5;
+            this.ParameterConfig.scene.add(this.ParameterConfig.water);
+
+        });
+    }
     VideoTextureFun() {
-        const video = document.createElement("video");
-        video.src = "test2.mp4";
+        let planeGeometry = new THREE.PlaneGeometry(10, 5);
+        let material = new THREE.MeshPhongMaterial();//MeshBasicMaterial
+        material.side = THREE.DoubleSide;
+        let mesh = new THREE.Mesh(planeGeometry, material);
+        this.ParameterConfig.scene.add(mesh);
+        let video = document.createElement("video");
+        video.src = require("@/assets/video/sintel.mp4");
         video.loop = true;
         video.muted = true;
         video.playbackRate = 0.6;
         video.play();
-
-
-        const videoPlane = gltf.scene.getObjectByName("video");
-
-
-        videoPlane.material = new THREE.MeshBasicMaterial({
-            map: new THREE.VideoTexture(video),
-        });
-        videoPlane.geometry.attributes.uv = new THREE.BufferAttribute(
-            new Uint8Array([0, 0, 1, 0, 0, 1, 1, 1]),
-            2
-        );
-        
+        let texture = new THREE.VideoTexture(video);
+        texture.minFilter = THREE.LinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        texture.format = THREE.RGBFormat;
+        material.map = texture;
+        // planeGeometry.geometry.attributes.uv = new THREE.BufferAttribute(
+        //     new Uint8Array([0, 0, 1, 0, 0, 1, 1, 1]),
+        //     2
+        // );
     }
-
+    AnimationFun() {
+        // this.ParameterConfig.water.material.uniforms['time'].value += 2.0 / 60.0;
+    }
 }
 export { ModelClass }
