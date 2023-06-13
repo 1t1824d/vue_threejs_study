@@ -179,4 +179,8 @@ https://blog.csdn.net/u014361280/article/details/124309410
 
 https://blog.csdn.net/u012551928/article/details/128670667
 
+38.//视频作为Three.js纹理贴图(VideoTexture) 
+
+https://blog.csdn.net/u014291990/article/details/103026218
+
 ```

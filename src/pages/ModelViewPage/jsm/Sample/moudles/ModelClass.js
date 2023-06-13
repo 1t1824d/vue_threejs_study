@@ -26,8 +26,9 @@ class ModelClass {
         this.ParameterConfig.scene.add(this.ParameterConfig.Group);
         //this.loadGLTF(); // 加载GLTF模型
         //this.loadGLTF2()
-        // this.loadGLTF3()
-        this.load3D()
+        this.loadGLTF3()
+        // this.load3D()
+       //  this.VideoTextureFun()
     }
     // 加载GLTF模型
     loadGLTF() {
@@ -235,8 +236,14 @@ class ModelClass {
                         // item.material.opacity = 0.5;
                         console.log(`item`, item);
                         if (item.name == "Object_4") {
-                            const texLoader = new THREE.TextureLoader();
-                            const texture = texLoader.load(require('@/assets/img/back.jpg'));// 加载手机mesh另一个颜色贴图
+                            // const texLoader = new THREE.TextureLoader();
+                            // const texture = texLoader.load(require('@/assets/img/back.jpg'));// 加载手机mesh另一个颜色贴图
+                            // 创建video对象
+                            let video = document.createElement('video');
+                            video.src = require("@/assets/video/sintel.mp4"); // 设置视频地址
+                            video.autoplay = "autoplay"; //要设置播放
+                            // video对象作为VideoTexture参数创建纹理对象
+                            var texture = new THREE.VideoTexture(video)
                             item.material.map = texture
                         } else {
                             this.shaderObj(item);
@@ -303,26 +310,20 @@ class ModelClass {
         });
     }
     VideoTextureFun() {
-        let planeGeometry = new THREE.PlaneGeometry(10, 5);
-        let material = new THREE.MeshPhongMaterial();//MeshBasicMaterial
-        material.side = THREE.DoubleSide;
-        let mesh = new THREE.Mesh(planeGeometry, material);
-        this.ParameterConfig.scene.add(mesh);
-        let video = document.createElement("video");
-        video.src = require("@/assets/video/sintel.mp4");
-        video.loop = true;
-        video.muted = true;
-        video.playbackRate = 0.6;
-        video.play();
-        let texture = new THREE.VideoTexture(video);
-        texture.minFilter = THREE.LinearFilter;
-        texture.magFilter = THREE.LinearFilter;
-        texture.format = THREE.RGBFormat;
-        material.map = texture;
-        // planeGeometry.geometry.attributes.uv = new THREE.BufferAttribute(
-        //     new Uint8Array([0, 0, 1, 0, 0, 1, 1, 1]),
-        //     2
-        // );
+        // 创建video对象
+        let video = document.createElement('video');
+        video.src = require("@/assets/video/sintel.mp4"); // 设置视频地址
+        video.autoplay = "autoplay"; //要设置播放
+        // video对象作为VideoTexture参数创建纹理对象
+        var texture = new THREE.VideoTexture(video)
+        var geometry = new THREE.PlaneGeometry(108, 71); //矩形平面
+        var material = new THREE.MeshPhongMaterial({
+            map: texture, // 设置纹理贴图
+            side: THREE.DoubleSide,
+        }); //材质对象Material
+        var mesh = new THREE.Mesh(geometry, material); //网格模型对象Mesh
+        this.ParameterConfig.scene.add(mesh); //网格模型添加到场景中
+        //视频作为Three.js纹理贴图(VideoTexture)  https://blog.csdn.net/u014291990/article/details/103026218
     }
     AnimationFun() {
         // this.ParameterConfig.water.material.uniforms['time'].value += 2.0 / 60.0;
