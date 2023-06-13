@@ -17,10 +17,7 @@ export default {
         }
     },
     beforeDestroy() {
-        if (!this.InitDrawThreeJsClass.ThreeJsContainer) return;
-        this.InitDrawThreeJsClass.dispose();
-        this.InitDrawThreeJsClass = null
-        this.MyThreeJsContainer = null
+        this.DisposeFun()
     },
     mounted() {
         this.$nextTick(() => {
@@ -40,8 +37,15 @@ export default {
                 this.InitDrawThreeJsClass.ParameterConfig.WBGLCanvasWidth = this.MyThreeJsContainer.getBoundingClientRect().width
                 this.InitDrawThreeJsClass.ParameterConfig.WBGLCanvasHeight = this.MyThreeJsContainer.getBoundingClientRect().height
                 this.InitDrawThreeJsClass.WindowResizeResetViewFun()
-             
+
             })
+        },
+        DisposeFun() {
+            if (this?.InitDrawThreeJsClass?.ThreeJsContainer) {
+                this.InitDrawThreeJsClass.dispose();
+                this.InitDrawThreeJsClass = null
+                this.MyThreeJsContainer = null
+            }
         },
     }
 }

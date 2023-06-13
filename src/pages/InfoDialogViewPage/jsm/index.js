@@ -46,17 +46,23 @@ class DrawThreeJsClass {
 
     }
     SkyCubeTexture() {
-        // let textureLoader = new THREE.TextureLoader();
-        // // let bgtexture = textureLoader.load('img/back.jpg');
-        // let bgtexture = textureLoader.load(require('@/assets/img/back.jpg'));
-        // this.ParameterConfig.scene.background = bgtexture // 纹理对象Texture赋值给场景对象的背景属性.background
-        //////
-        let cubeTextureLoader = new THREE.CubeTextureLoader();
-        cubeTextureLoader.setPath('img/Park3/');
-        let cubeTexture = cubeTextureLoader.load([
-            'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg'
-        ]);
-        this.ParameterConfig.scene.background = cubeTexture;
+        let promiseVal = new Promise((resolve, reject) => {
+            // let textureLoader = new THREE.TextureLoader();
+            // // let bgtexture = textureLoader.load('img/back.jpg');
+            // let bgtexture = textureLoader.load(require('@/assets/img/back.jpg'));
+            // this.ParameterConfig.scene.background = bgtexture // 纹理对象Texture赋值给场景对象的背景属性.background
+            //////
+            let cubeTextureLoader = new THREE.CubeTextureLoader();
+            cubeTextureLoader.setPath('img/Park3/');
+            let cubeTexture = cubeTextureLoader.load([
+                'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg'
+            ]);
+            resolve(cubeTexture)
+            reject("天空图加载失败!")
+        })
+        promiseVal.then((cubeTexture) => {
+            this.ParameterConfig.scene.background = cubeTexture;
+        })
     }
     // 创建相机
     CreateCamera() {
@@ -179,6 +185,17 @@ class DrawThreeJsClass {
             this.CancelAnimationFun()
             this.ThreeJsContainer.parentNode.removeChild(this.ThreeJsContainer);
             this.ThreeJsContainer = null
+            if (this.ParameterConfig.renderer) {
+                this.ParameterConfig.renderer.forceContextLoss();
+                this.ParameterConfig.renderer.dispose();
+                this.ParameterConfig.renderer = null;
+                this.ParameterConfig.camera = null;
+            }
+            if (this.ParameterConfig.scene) {
+                this.ParameterConfig.scene.clear()
+                this.ParameterConfig.scene = null;
+            }
+            this.ParameterConfig = {}
         }
     }
     //画布自适应

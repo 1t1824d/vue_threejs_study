@@ -5,7 +5,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls'
 import { LightClass } from './Light/index'
-import { UvAnimationClass, BoxGeometryClass } from './Sample/index'
+import { UvAnimationClass, BoxGeometryClass,ModelClass } from './Sample/index'
 import { debounce, ScreenTransToThreeCoord, ThreeTransToScreenCoord, GetXYToCanvas } from './uitls/index'
 ///////////
 // 引入后处理扩展库EffectComposer.js
@@ -64,17 +64,23 @@ class DrawThreeJsClass {
 
     }
     SkyCubeTexture() {
-        // let textureLoader = new THREE.TextureLoader();
-        // // let bgtexture = textureLoader.load('img/back.jpg');
-        // let bgtexture = textureLoader.load(require('@/assets/img/back.jpg'));
-        // this.ParameterConfig.scene.background = bgtexture // 纹理对象Texture赋值给场景对象的背景属性.background
-        //////
-        let cubeTextureLoader = new THREE.CubeTextureLoader();
-        cubeTextureLoader.setPath('img/Park2/');
-        let cubeTexture = cubeTextureLoader.load([
-            'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg'
-        ]);
-        this.ParameterConfig.scene.background = cubeTexture;
+        let promiseVal = new Promise((resolve, reject) => {
+            // let textureLoader = new THREE.TextureLoader();
+            // // let bgtexture = textureLoader.load('img/back.jpg');
+            // let bgtexture = textureLoader.load(require('@/assets/img/back.jpg'));
+            // this.ParameterConfig.scene.background = bgtexture // 纹理对象Texture赋值给场景对象的背景属性.background
+            //////
+            let cubeTextureLoader = new THREE.CubeTextureLoader();
+            cubeTextureLoader.setPath('img/Park3/');
+            let cubeTexture = cubeTextureLoader.load([
+                'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg'
+            ]);
+            resolve(cubeTexture)
+            reject("天空图加载失败!")
+        })
+        promiseVal.then((cubeTexture) => {
+            this.ParameterConfig.scene.background = cubeTexture;
+        })
     }
     // 创建相机
     CreateCamera() {
@@ -99,7 +105,7 @@ class DrawThreeJsClass {
         this.CreateControls()
         this.CreateStats()
         this.GridHelperFun()
-        this.CreateTransformControls()
+       // this.CreateTransformControls()
         return this
     }
     // 创建光源
@@ -241,8 +247,9 @@ class DrawThreeJsClass {
         // console.log(`this,this.ParameterConfig`, this,this.ParameterConfig);
         if (this.ParameterConfig.renderer.domElement) {
             this.DblclickFullscreenFun()
-            this.ParameterConfig.InitUvAnimationClass = new UvAnimationClass(this.ParameterConfig)
-            this.ParameterConfig.InitBoxGeometryClass = new BoxGeometryClass(this.ParameterConfig)
+            //this.ParameterConfig.InitUvAnimationClass = new UvAnimationClass(this.ParameterConfig)
+            //this.ParameterConfig.InitBoxGeometryClass = new BoxGeometryClass(this.ParameterConfig)
+            this.ParameterConfig.InitModelClass= new ModelClass(this.ParameterConfig)
             this.EffectComposerFun()
         }
         return this
@@ -252,7 +259,7 @@ class DrawThreeJsClass {
         this.ParameterConfig.RequestAnimationFrameVal = requestAnimationFrame(() => {
             this.UpdateFun()
         })
-        this.ParameterConfig.InitUvAnimationClass.AnimationFun()
+       // this.ParameterConfig.InitUvAnimationClass.AnimationFun()
         this.ParameterConfig.controls.update();
         this.ParameterConfig.stats.update();
         this.ParameterConfig.renderer.render(this.ParameterConfig.scene, this.ParameterConfig.camera);
@@ -279,6 +286,17 @@ class DrawThreeJsClass {
             this.CancelAnimationFun()
             this.ThreeJsContainer.parentNode.removeChild(this.ThreeJsContainer);
             this.ThreeJsContainer = null
+            if (this.ParameterConfig.renderer) {
+                this.ParameterConfig.renderer.forceContextLoss();
+                this.ParameterConfig.renderer.dispose();
+                this.ParameterConfig.renderer = null;
+                this.ParameterConfig.camera = null;
+            }
+            if (this.ParameterConfig.scene) {
+                this.ParameterConfig.scene.clear()
+                this.ParameterConfig.scene = null;
+            }
+            this.ParameterConfig = {}
         }
     }
     //画布自适应

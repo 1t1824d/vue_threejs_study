@@ -99,7 +99,17 @@ export default {
                 this.CancelAnimationFun()
                 this.MyThreeJsContainer.parentNode.removeChild(this.MyThreeJsContainer);
                 this.MyThreeJsContainer = null
-
+                if (this.ThreeJsConfig.renderer) {
+                    this.ThreeJsConfig.renderer.forceContextLoss();
+                    this.ThreeJsConfig.renderer.dispose();
+                    this.ThreeJsConfig.renderer = null;
+                    this.ThreeJsConfig.camera = null;
+                }
+                if (this.ThreeJsConfig.scene) {
+                    this.ThreeJsConfig.scene.clear()
+                    this.ThreeJsConfig.scene = null;
+                }
+                this.ThreeJsConfig = {}
             }
         },
         //取消动画

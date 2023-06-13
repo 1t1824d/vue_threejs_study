@@ -28,10 +28,7 @@ export default {
         }
     },
     beforeDestroy() {
-        if (!this.InitDrawThreeJsClass.ThreeJsContainer) return;
-        this.InitDrawThreeJsClass.dispose();
-        this.InitDrawThreeJsClass = null
-        this.MyThreeJsContainer = null
+       this.DisposeFun()
     },
     mounted() {
         this.$nextTick(() => {
@@ -56,6 +53,13 @@ export default {
                 this.InitDrawThreeJsClass.WindowResizeResetViewFun()
 
             })
+        },
+        DisposeFun() {
+            if (this?.InitDrawThreeJsClass?.ThreeJsContainer) {
+                this.InitDrawThreeJsClass.dispose();
+                this.InitDrawThreeJsClass = null
+                this.MyThreeJsContainer = null
+            }
         },
     }
 }

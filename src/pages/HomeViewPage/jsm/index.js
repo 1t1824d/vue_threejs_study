@@ -9,7 +9,7 @@ import { EffectComposerClass } from "./EffectComposer/index";
 class DrawThreeJsClass {
     constructor(ThreeJsContainer) {
         this.ThreeJsContainer = ThreeJsContainer
-        this.ParameterConfig = { ThreeJsContainer, RequestAnimationFrameVal: null, clock: new THREE.Clock()  }
+        this.ParameterConfig = { ThreeJsContainer, RequestAnimationFrameVal: null, clock: new THREE.Clock() }
         this.DrawThreeJsFun()
     }
     DrawThreeJsFun() {
@@ -25,7 +25,7 @@ class DrawThreeJsClass {
             alpha: true,
             preserveDrawingBuffer: true,
             logarithmicDepthBuffer: true,// 设置对数深度缓冲区，优化深度冲突问题
-           // logarithmicDepthBuffer: false, //如果要在单个场景中处理巨大的比例差异，就有必要使用。此处要用false，否则文字标签不显示
+            // logarithmicDepthBuffer: false, //如果要在单个场景中处理巨大的比例差异，就有必要使用。此处要用false，否则文字标签不显示
         });
         this.ParameterConfig.renderer.setSize(WBGLCanvasWidth, WBGLCanvasHeight);
         this.ParameterConfig.renderer.setPixelRatio(window.devicePixelRatio);
@@ -46,17 +46,23 @@ class DrawThreeJsClass {
 
     }
     SkyCubeTexture() {
-        // let textureLoader = new THREE.TextureLoader();
-        // // let bgtexture = textureLoader.load('img/back.jpg');
-        // let bgtexture = textureLoader.load(require('@/assets/img/back.jpg'));
-        // this.ParameterConfig.scene.background = bgtexture // 纹理对象Texture赋值给场景对象的背景属性.background
-        //////
-        let cubeTextureLoader = new THREE.CubeTextureLoader();
-        cubeTextureLoader.setPath('img/Park3/');
-        let cubeTexture = cubeTextureLoader.load([
-            'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg'
-        ]);
-        this.ParameterConfig.scene.background = cubeTexture;
+        let promiseVal = new Promise((resolve, reject) => {
+            // let textureLoader = new THREE.TextureLoader();
+            // // let bgtexture = textureLoader.load('img/back.jpg');
+            // let bgtexture = textureLoader.load(require('@/assets/img/back.jpg'));
+            // this.ParameterConfig.scene.background = bgtexture // 纹理对象Texture赋值给场景对象的背景属性.background
+            //////
+            let cubeTextureLoader = new THREE.CubeTextureLoader();
+            cubeTextureLoader.setPath('img/Park3/');
+            let cubeTexture = cubeTextureLoader.load([
+                'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg'
+            ]);
+            resolve(cubeTexture)
+            reject("天空图加载失败!")
+        })
+        promiseVal.then((cubeTexture) => {
+            this.ParameterConfig.scene.background = cubeTexture;
+        })
     }
     // 创建相机
     CreateCamera() {
@@ -80,7 +86,7 @@ class DrawThreeJsClass {
         this.CreateLight()
         this.CreateControls()
         this.CreateStats()
-       // this.GridHelperFun()
+        // this.GridHelperFun()
         return this
     }
     // 创建光源
@@ -131,9 +137,9 @@ class DrawThreeJsClass {
             this.DblclickFullscreenFun()
             this.ParameterConfig.InitUvAnimationClass = new UvAnimationClass(this.ParameterConfig)
             this.ParameterConfig.InitBoxGeometryClass = new BoxGeometryClass(this.ParameterConfig)
-        //////// 后期处理 ///////////
-        this.ParameterConfig.EffectComposerClass = new EffectComposerClass(this.ParameterConfig)
-        ///////////////////////////
+            //////// 后期处理 ///////////
+            this.ParameterConfig.EffectComposerClass = new EffectComposerClass(this.ParameterConfig)
+            ///////////////////////////
         }
         return this
     }
@@ -146,9 +152,9 @@ class DrawThreeJsClass {
         this.ParameterConfig.RequestAnimationFrameVal = requestAnimationFrame(() => {
             this.UpdateFun()
         })
-           ////////////// 后期处理 /////////////
-           this.ParameterConfig.EffectComposerClass.AnimationFun()
-           ////////////////////////////////
+        ////////////// 后期处理 /////////////
+        this.ParameterConfig.EffectComposerClass.AnimationFun()
+        ////////////////////////////////
     }
     //取消动画
     CancelAnimationFun() {
@@ -164,6 +170,17 @@ class DrawThreeJsClass {
             this.CancelAnimationFun()
             this.ThreeJsContainer.parentNode.removeChild(this.ThreeJsContainer);
             this.ThreeJsContainer = null
+            if (this.ParameterConfig.renderer) {
+                this.ParameterConfig.renderer.forceContextLoss();
+                this.ParameterConfig.renderer.dispose();
+                this.ParameterConfig.renderer = null;
+                this.ParameterConfig.camera = null;
+            }
+            if (this.ParameterConfig.scene) {
+                this.ParameterConfig.scene.clear()
+                this.ParameterConfig.scene = null;
+            }
+            this.ParameterConfig = {}
         }
     }
     //画布自适应
@@ -190,7 +207,29 @@ class DrawThreeJsClass {
             }
         })
     }
-
+    //销毁组数据
+    ClearGroup(group) {
+        //清除缓存
+        const clearCache = (item) => {
+            item.geometry.dispose();//必须对组中的material与geometry进行dispose，清除占用的缓存
+            item.material.dispose();
+        };
+        //移除模型
+        const removeObj = (obj) => {
+            let arr = obj.children.filter((x) => x);
+            arr.forEach((item) => {
+                if (item.children.length) {
+                    removeObj(item);
+                } else {
+                    clearCache(item);
+                    item.clear();
+                }
+            });
+            obj.clear();
+            arr = null;
+        };
+        removeObj(group);
+    }
 
 }
 export { DrawThreeJsClass }
