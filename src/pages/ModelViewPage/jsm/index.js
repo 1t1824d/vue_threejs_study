@@ -5,7 +5,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls'
 import { LightClass } from './Light/index'
-import { UvAnimationClass, BoxGeometryClass,ModelClass } from './Sample/index'
+import { UvAnimationClass, BoxGeometryClass, ModelClass } from './Sample/index'
 import { debounce, ScreenTransToThreeCoord, ThreeTransToScreenCoord, GetXYToCanvas } from './uitls/index'
 ///////////
 // 引入后处理扩展库EffectComposer.js
@@ -70,11 +70,24 @@ class DrawThreeJsClass {
             // let bgtexture = textureLoader.load(require('@/assets/img/back.jpg'));
             // this.ParameterConfig.scene.background = bgtexture // 纹理对象Texture赋值给场景对象的背景属性.background
             //////
+            // let cubeTextureLoader = new THREE.CubeTextureLoader();
+            // cubeTextureLoader.setPath('img/Park3/');
+            // let cubeTexture = cubeTextureLoader.load([
+            //     'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg'
+            // ]);
+            ///
+
+            var urls = [
+                require('@/assets/img/Park3/posx.jpg'),
+                require('@/assets/img/Park3/negx.jpg'),
+                require('@/assets/img/Park3/posy.jpg'),
+                require('@/assets/img/Park3/negy.jpg'),
+                require('@/assets/img/Park3/posz.jpg'),
+                require('@/assets/img/Park3/negz.jpg'),
+            ];
             let cubeTextureLoader = new THREE.CubeTextureLoader();
-            cubeTextureLoader.setPath('img/Park3/');
-            let cubeTexture = cubeTextureLoader.load([
-                'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg'
-            ]);
+            let cubeTexture = cubeTextureLoader.load(urls);
+            ///
             resolve(cubeTexture)
             reject("天空图加载失败!")
         })
@@ -105,7 +118,7 @@ class DrawThreeJsClass {
         this.CreateControls()
         this.CreateStats()
         this.GridHelperFun()
-       // this.CreateTransformControls()
+        // this.CreateTransformControls()
         return this
     }
     // 创建光源
@@ -249,7 +262,7 @@ class DrawThreeJsClass {
             this.DblclickFullscreenFun()
             //this.ParameterConfig.InitUvAnimationClass = new UvAnimationClass(this.ParameterConfig)
             //this.ParameterConfig.InitBoxGeometryClass = new BoxGeometryClass(this.ParameterConfig)
-            this.ParameterConfig.InitModelClass= new ModelClass(this.ParameterConfig)
+            this.ParameterConfig.InitModelClass = new ModelClass(this.ParameterConfig)
             this.EffectComposerFun()
         }
         return this
@@ -259,7 +272,7 @@ class DrawThreeJsClass {
         this.ParameterConfig.RequestAnimationFrameVal = requestAnimationFrame(() => {
             this.UpdateFun()
         })
-       // this.ParameterConfig.InitUvAnimationClass.AnimationFun()
+        // this.ParameterConfig.InitUvAnimationClass.AnimationFun()
         this.ParameterConfig.controls.update();
         this.ParameterConfig.stats.update();
         this.ParameterConfig.renderer.render(this.ParameterConfig.scene, this.ParameterConfig.camera);
