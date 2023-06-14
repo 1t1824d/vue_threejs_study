@@ -28,7 +28,9 @@ class ModelClass {
         //this.loadGLTF2()
         this.loadGLTF3()
         // this.load3D()
-        //  this.VideoTextureFun()
+       this.VideoTextureFun()
+        this.WaterTextureFun()
+        this.CanvasTextureFun()
     }
     // 加载GLTF模型
     loadGLTF() {
@@ -320,43 +322,126 @@ class ModelClass {
         })
     }
     WaterTextureFun() {
-        new THREE.TextureLoader().loadAsync(require('@/assets/img/waternormals.jpg')).then((waterNormals) => {
-            waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping;
-            this.ParameterConfig.water = new THREE.Water(new THREE.PlaneGeometry(1000, 1000), {
-                textureWidth: 512,
-                textureHeight: 512,
-                waterNormals,
-                sunDirection: new THREE.Vector3(),
-                sunColor: 0xffffff,
-                waterColor: 0x001e0f,
-                distortionScale: 3.7,
-                fog: !!this.ParameterConfig.scene.fog,
-            });
-            this.ParameterConfig.water.position.y = 0;
-            this.ParameterConfig.water.position.x = -200;
-            this.ParameterConfig.water.rotation.x = Math.PI * -0.5;
-            this.ParameterConfig.scene.add(this.ParameterConfig.water);
-
+         // 创建水面材质的参数
+         const waterParams = {
+            color: '#fff',
+            scale: 4,
+            flowX: 1,
+            flowY: 1,
+        };
+        // 创建水面材质
+        this.ParameterConfig.waterMaterial = new THREE.ShaderMaterial({
+            textureWidth: 1512, // 水浑浊程度，密度
+            textureHeight: 1512, // 水浑浊程度，密度
+            depthWrite:false,
+            side: THREE.DoubleSide,
+            fog: this.ParameterConfig.scene.fog !== undefined,
+            uniforms: {
+                uTime: { value: 0 },
+                uColor: { value: new THREE.Color(waterParams.color) },
+                uNormalMap: { value: new THREE.TextureLoader().load('img/waternormals.jpg', (texture) => {
+                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                }), },
+                uScale: { value: waterParams.scale },
+                uFlowX: { value: waterParams.flowX },
+                uFlowY: { value: waterParams.flowY },
+            },
+            vertexShader: `
+      uniform float uTime;
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+            fragmentShader: `
+      uniform float uTime;
+      uniform vec3 uColor;
+      uniform sampler2D uNormalMap;
+      uniform float uScale;
+      uniform float uFlowX;
+      uniform float uFlowY;
+      varying vec2 vUv;
+      void main() {
+        // 使用纹理坐标和时间创建水波效果
+        vec2 uv = vUv * uScale + vec2(uFlowX, uFlowY) * uTime * 0.1;
+        vec3 normal = texture2D(uNormalMap, uv).rgb;
+        vec3 color = mix(uColor * 0.8, uColor, smoothstep(0.4, 0.6, normal.y));
+        gl_FragColor = vec4(color, 1.0);
+      }
+    `,
         });
+
+        // 创建水面对象
+        const waterGeometry = new THREE.PlaneGeometry(500, 500, 1132, 1132);
+        const waterMesh = new THREE.Mesh(waterGeometry, this.ParameterConfig.waterMaterial);
+        waterMesh.rotation.x = -Math.PI / 2; // 使水面朝上
+        waterMesh.position.x=0
+        waterMesh.position.y=-30
+        waterMesh.position.z=0
+        this.ParameterConfig.scene.add(waterMesh);
+        //水面效果 https://blog.csdn.net/baidu_29701003/article/details/131105965
     }
     VideoTextureFun() {
-        // 创建video对象
-        let video = document.createElement('video');
-        video.src = require("@/assets/video/sintel.mp4"); // 设置视频地址
-        video.autoplay = "autoplay"; //要设置播放
-        // video对象作为VideoTexture参数创建纹理对象
-        var texture = new THREE.VideoTexture(video)
-        var geometry = new THREE.PlaneGeometry(108, 71); //矩形平面
-        var material = new THREE.MeshPhongMaterial({
-            map: texture, // 设置纹理贴图
-            side: THREE.DoubleSide,
-        }); //材质对象Material
-        var mesh = new THREE.Mesh(geometry, material); //网格模型对象Mesh
-        this.ParameterConfig.scene.add(mesh); //网格模型添加到场景中
-        //视频作为Three.js纹理贴图(VideoTexture)  https://blog.csdn.net/u014291990/article/details/103026218
+         // 创建video对象
+         let video = document.createElement('video');
+         video.src = require("@/assets/video/pano.webm");//  "video/sintel.mp4"//// 设置视频地址
+         video.autoplay = "autoplay"; //要设置播放
+         video.loop = "loop"; //要设置播放
+         // video对象作为VideoTexture参数创建纹理对象
+         this.texture = new THREE.VideoTexture(video)
+         this.texture.colorSpace = THREE.SRGBColorSpace;
+         this.texture.minFilter = THREE.LinearFilter;
+         this.texture.magFilter = THREE.LinearFilter;
+         this.texture.needsUpdate = true;
+         this.texture.update()
+         let geometry = new THREE.PlaneGeometry(108, 71); //矩形平面
+         let material = new THREE.MeshBasicMaterial({
+             map: this.texture, // 设置纹理贴图
+             side: THREE.DoubleSide,
+         }); //材质对象Material
+         let mesh = new THREE.Mesh(geometry, material); //网格模型对象Mesh
+         mesh.rotation.y = -Math.PI / 2
+         mesh.position.y = 50
+         mesh.position.z = 30
+         this.ParameterConfig.scene.add(mesh); //网格模型添加到场景中
+ 
+         // video.addEventListener('canplaythrough', (event) => {
+         //     console.log('我想我可以播放整个视频，而不必停下来缓冲。');
+         // });
+ 
+         //视频作为Three.js纹理贴图(VideoTexture)  https://blog.csdn.net/u014291990/article/details/103026218
     }
+    CanvasTextureFun(){
+        let canvas = document.createElement('canvas');
+        canvas.width = 150;
+        canvas.height = 150;
+        let ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#ffffff";
+        let img = new Image();
+       // img.src = "https://img0.baidu.com/it/u=3226103969,2404354919&fm=253&fmt=auto&app=138&f=JPEG?w=634&h=500";
+        img.src = require("@/assets/img/back.jpg");
+        img.crossOrigin = "anonymous";
+        img.onload =  ()=> {
+            ctx.drawImage(img, 0, 0, 200, 200);
+            let texture = new THREE.CanvasTexture(canvas);
+            texture.needsUpdate = true; // 不设置needsUpdate为true的话，可能纹理贴图不刷新
+            let geometry = new THREE.BoxGeometry(60, 50, 30);
+            let material = new THREE.MeshPhongMaterial({
+                // color:0x11ff22,
+                map: texture,
+                side: THREE.DoubleSide
+            });
+            let mesh = new THREE.Mesh(geometry, material);
+            mesh.position.x= -230;
+            this.ParameterConfig.scene.add(mesh);
+            //three.js 使用canvas加载图片作为模型的纹理贴图 https://blog.csdn.net/yinge0508/article/details/123090525
+    }
+}
     AnimationFun() {
-        // this.ParameterConfig.water.material.uniforms['time'].value += 2.0 / 60.0;
+       // 更新时间和水面材质的相关属性
+       const time = performance.now() * 0.001;
+       this.ParameterConfig.waterMaterial.uniforms.uTime.value = time;
     }
 }
 export { ModelClass }
