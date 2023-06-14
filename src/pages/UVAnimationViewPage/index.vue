@@ -34,9 +34,11 @@ export default {
         OnWindowResize() {
             //监听画面变化，更新渲染画面，（自适应的大小）
             window.addEventListener('resize', () => {
-                this.InitDrawThreeJsClass.ParameterConfig.WBGLCanvasWidth = this.MyThreeJsContainer.getBoundingClientRect().width
-                this.InitDrawThreeJsClass.ParameterConfig.WBGLCanvasHeight = this.MyThreeJsContainer.getBoundingClientRect().height
-                this.InitDrawThreeJsClass.WindowResizeResetViewFun()
+                if (this?.InitDrawThreeJsClass?.ParameterConfig) {
+                    this.InitDrawThreeJsClass.ParameterConfig.WBGLCanvasWidth = this.MyThreeJsContainer.getBoundingClientRect().width
+                    this.InitDrawThreeJsClass.ParameterConfig.WBGLCanvasHeight = this.MyThreeJsContainer.getBoundingClientRect().height
+                    this.InitDrawThreeJsClass.WindowResizeResetViewFun()
+                }
 
             })
         },

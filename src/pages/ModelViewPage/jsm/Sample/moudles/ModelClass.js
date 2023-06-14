@@ -28,14 +28,14 @@ class ModelClass {
         //this.loadGLTF2()
         this.loadGLTF3()
         // this.load3D()
-       //  this.VideoTextureFun()
+        //  this.VideoTextureFun()
     }
     // 加载GLTF模型
     loadGLTF() {
         ////
         const loader = new GLTFLoader();
         const modelLoaded = loader
-            .loadAsync("model/shuichang.glb", (xhr) => {
+            .loadAsync(`model/shuichang.glb`, (xhr) => {
                 console.log(`xhr`, xhr);
                 console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
             })
@@ -64,7 +64,7 @@ class ModelClass {
         // let promiseVal = new Promise((resolve, reject) => {
         //     let loader = new GLTFLoader();
         //     loader.load(
-        //         "model/shuichang.glb",
+            //`model/shuichang.glb`
         //         (model) => {
         //             resolve(model)
         //             reject("model加载失败!")
@@ -160,7 +160,7 @@ class ModelClass {
         let promiseVal = new Promise((resolve, reject) => {
             let loader = new GLTFLoader();
             loader.load(
-                "model/water_treament_plant.glb",
+                `model/water_treament_plant.glb`,
                 (model) => {
                     resolve(model)
                     reject("model加载失败!")
@@ -209,9 +209,30 @@ class ModelClass {
 
     }
     loadGLTF3() {
-        const loader = new GLTFLoader();
+        /////加载进度//////
+        const manager = new THREE.LoadingManager();
+        manager.onStart = function (url, itemsLoaded, itemsTotal) {
+            console.log('Started loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.');
+        };
+        manager.onLoad = function () {
+            // 所有资源都加载完成后执行事件
+            console.log('Loading complete!');
+        };
+        manager.onProgress = function (url, itemsLoaded, itemsTotal) {
+            console.log('Loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.');
+            const percentComplete = parseInt(Math.round((itemsLoaded / itemsTotal) * 100, 2)) + '%'
+            //加载页的进度条百分比交互在这里写
+            console.log(`加载页的进度条百分比交互在这里写`, percentComplete);
+        };
+        manager.onError = function (url) {
+            console.log('There was an error loading ' + url);
+        };
+        //three.js模型及贴图资源预加载 https://blog.csdn.net/qq_33298964/article/details/130636632
+        //https://threejs.org/docs/index.html?q=LoadingManager#api/zh/loaders/managers/LoadingManager
+        //////////////////////////
+        const loader = new GLTFLoader(manager);
         const modelLoaded = loader
-            .loadAsync("model/water_treament_plant.glb", (xhr) => {
+            .loadAsync(`model/water_treament_plant.glb`, (xhr) => {
                 console.log(`xhr`, xhr);
                 console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
             })
@@ -236,15 +257,24 @@ class ModelClass {
                         // item.material.opacity = 0.5;
                         console.log(`item`, item);
                         if (item.name == "Object_4") {
-                            // const texLoader = new THREE.TextureLoader();
-                            // const texture = texLoader.load(require('@/assets/img/back.jpg'));// 加载手机mesh另一个颜色贴图
-                            // 创建video对象
+                            let texture
+                            // let texLoader = new THREE.TextureLoader();
+                            // texture = texLoader.load(require('@/assets/img/back.jpg'));// 加载手机mesh另一个颜色贴图
+                            // video对象作为VideoTexture参数创建纹理对象 创建video对象
                             let video = document.createElement('video');
-                            video.src = require("@/assets/video/sintel.mp4"); // 设置视频地址
+                            video.src = require("@/assets/video/pano.webm");//  "video/sintel.mp4"//// 设置视频地址
                             video.autoplay = "autoplay"; //要设置播放
                             // video对象作为VideoTexture参数创建纹理对象
-                            var texture = new THREE.VideoTexture(video)
+                            texture = new THREE.VideoTexture(video)
+                            texture.colorSpace = THREE.SRGBColorSpace;
+                            texture.minFilter = THREE.LinearFilter;
+                            texture.magFilter = THREE.LinearFilter;
+                            texture.needsUpdate = true;
+                            texture.update()
                             item.material.map = texture
+                            // video.addEventListener('canplaythrough', (event) => {
+                            //   console.log('我想我可以播放整个视频，而不必停下来缓冲。');
+                            // });
                         } else {
                             this.shaderObj(item);
                         }

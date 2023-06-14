@@ -6,10 +6,13 @@ import Stats from 'three/examples/jsm/libs/stats.module.js';
 import { LightClass } from './Light/index'
 import { UvAnimationClass, BoxGeometryClass, EarthBoxGeometrClass } from './Sample/index'
 import { EffectComposerClass } from "./EffectComposer/index";
+import ResourceTracker from "./uitls/TrackResource";
 class DrawThreeJsClass {
     constructor(ThreeJsContainer) {
         this.ThreeJsContainer = ThreeJsContainer
         this.ParameterConfig = { ThreeJsContainer, RequestAnimationFrameVal: null, clock: new THREE.Clock() }
+        this.resMgr = new ResourceTracker();
+        this.track = this.resMgr.track.bind(this.resMgr);
         this.DrawThreeJsFun()
     }
     DrawThreeJsFun() {
@@ -52,11 +55,24 @@ class DrawThreeJsClass {
             // let bgtexture = textureLoader.load(require('@/assets/img/back.jpg'));
             // this.ParameterConfig.scene.background = bgtexture // 纹理对象Texture赋值给场景对象的背景属性.background
             //////
+            // let cubeTextureLoader = new THREE.CubeTextureLoader();
+            // cubeTextureLoader.setPath('img/Park3/');
+            // let cubeTexture = cubeTextureLoader.load([
+            //     'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg'
+            // ]);
+            ///
+
+            var urls = [
+                require('@/assets/img/Park3/posx.jpg'),
+                require('@/assets/img/Park3/negx.jpg'),
+                require('@/assets/img/Park3/posy.jpg'),
+                require('@/assets/img/Park3/negy.jpg'),
+                require('@/assets/img/Park3/posz.jpg'),
+                require('@/assets/img/Park3/negz.jpg'),
+            ];
             let cubeTextureLoader = new THREE.CubeTextureLoader();
-            cubeTextureLoader.setPath('img/Park3/');
-            let cubeTexture = cubeTextureLoader.load([
-                'posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg'
-            ]);
+            let cubeTexture = cubeTextureLoader.load(urls);
+            ///
             resolve(cubeTexture)
             reject("天空图加载失败!")
         })
@@ -181,38 +197,51 @@ class DrawThreeJsClass {
     }
     //销毁
     dispose() {
-        if (this.ThreeJsContainer) {
-            this.CancelAnimationFun()
-            this.ThreeJsContainer.parentNode.removeChild(this.ThreeJsContainer);
-            this.ThreeJsContainer = null
-            if (this.ParameterConfig.renderer) {
-                this.ParameterConfig.renderer.forceContextLoss();
-                this.ParameterConfig.renderer.dispose();
-                this.ParameterConfig.renderer = null;
-                this.ParameterConfig.camera = null;
+        try {
+            if (this.ThreeJsContainer) {
+                if (this.ParameterConfig.scene) {
+                    this.ParameterConfig.scene.clear()
+                    this.resMgr && this.resMgr.dispose()
+                    this.ParameterConfig.scene = null;
+                }
+                if (this.ParameterConfig.renderer) {
+                    this.ParameterConfig.renderer.dispose();
+                    this.ParameterConfig.renderer.forceContextLoss();
+                    this.ParameterConfig.renderer.content = null;
+                    let gl = this.ParameterConfig.renderer.domElement.getContext("webgl");
+                    gl && gl.getExtension("WEBGL_lose_context").loseContext();
+                    console.log(this.ParameterConfig.renderer.info)   //查看memery字段即可
+                    this.ParameterConfig.renderer = null;
+                    this.ParameterConfig.camera = null;
+
+                }
+                console.log(this.ParameterConfig.renderer)   //查看memery字段即可
+                this.CancelAnimationFun()
+                this.ThreeJsContainer.parentNode.removeChild(this.ThreeJsContainer);
+                this.ThreeJsContainer = null
+                this.ParameterConfig = {}
+
             }
-            if (this.ParameterConfig.scene) {
-                this.ParameterConfig.scene.clear()
-                this.ParameterConfig.scene = null;
-            }
-            this.ParameterConfig = {}
+        } catch (e) {
+            console.log(e)
         }
+        //Three.js 内存释放问题  https://blog.csdn.net/u014361280/article/details/124309410
     }
     //画布自适应
     WindowResizeResetViewFun() {
-        //更新摄像机的宽高比
-        this.ParameterConfig.camera.aspect = this.ParameterConfig.WBGLCanvasWidth / this.ParameterConfig.WBGLCanvasHeight
-        //更新摄像机的投影矩阵
-        this.ParameterConfig.camera.updateProjectionMatrix()
-        //设置渲染器的像素比
-        this.ParameterConfig.renderer.setPixelRatio(window.devicePixelRatio);
-        //更新渲染器宽度和高度
-        this.ParameterConfig.renderer.setSize(this.ParameterConfig.WBGLCanvasWidth, this.ParameterConfig.WBGLCanvasHeight)
-        console.log("画面变化了")
-        if (this.ParameterConfig.EffectComposerClass) {
-            this.ParameterConfig.EffectComposerClass.WindowResizeResetViewFun()
+        if (this?.ParameterConfig?.renderer) {  //更新摄像机的宽高比
+            this.ParameterConfig.camera.aspect = this.ParameterConfig.WBGLCanvasWidth / this.ParameterConfig.WBGLCanvasHeight
+            //更新摄像机的投影矩阵
+            this.ParameterConfig.camera.updateProjectionMatrix()
+            //设置渲染器的像素比
+            this.ParameterConfig.renderer.setPixelRatio(window.devicePixelRatio);
+            //更新渲染器宽度和高度
+            this.ParameterConfig.renderer.setSize(this.ParameterConfig.WBGLCanvasWidth, this.ParameterConfig.WBGLCanvasHeight)
+            console.log("画面变化了")
+            if (this.ParameterConfig.EffectComposerClass) {
+                this.ParameterConfig.EffectComposerClass.WindowResizeResetViewFun()
+            }
         }
-
     }
     //画布全屏
     DblclickFullscreenFun() {

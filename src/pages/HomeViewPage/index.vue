@@ -1,6 +1,6 @@
 <template>
     <div class="HomeViewPage">
-        <el-button @click="()=>{this.InitDrawThreeJsClass.dispose()}">销毁</el-button>
+        <el-button @click="() => { this.InitDrawThreeJsClass.dispose() }">销毁</el-button>
         <div class="HomeViewPageOutbox">
             <div class="mythreedemojsdiv" ref="MyThreeJsContainer">
             </div>
@@ -18,7 +18,7 @@ export default {
         }
     },
     beforeDestroy() {
-       this.DisposeFun()
+        this.DisposeFun()
     },
     mounted() {
         this.$nextTick(() => {
@@ -35,10 +35,12 @@ export default {
         OnWindowResize() {
             //监听画面变化，更新渲染画面，（自适应的大小）
             window.addEventListener('resize', () => {
-                this.InitDrawThreeJsClass.ParameterConfig.WBGLCanvasWidth = this.MyThreeJsContainer.getBoundingClientRect().width
-                this.InitDrawThreeJsClass.ParameterConfig.WBGLCanvasHeight = this.MyThreeJsContainer.getBoundingClientRect().height
-                this.InitDrawThreeJsClass.WindowResizeResetViewFun()
-             
+                if (this?.InitDrawThreeJsClass?.ParameterConfig) {
+                    this.InitDrawThreeJsClass.ParameterConfig.WBGLCanvasWidth = this.MyThreeJsContainer.getBoundingClientRect().width
+                    this.InitDrawThreeJsClass.ParameterConfig.WBGLCanvasHeight = this.MyThreeJsContainer.getBoundingClientRect().height
+                    this.InitDrawThreeJsClass.WindowResizeResetViewFun()
+                }
+
             })
         },
         DisposeFun() {

@@ -14,7 +14,7 @@ export default {
   name: "VideoTextureViewPage",
   data() {
     return {
-    
+
     }
   },
   mounted() {

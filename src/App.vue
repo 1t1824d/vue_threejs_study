@@ -20,50 +20,16 @@ export default {
       LinkUrlPath: [
         {
           path: '/',
-          name: 'home',
-          meta: {
-            title: "首页"
-          }
-        },
-        {
-          path: '/SimpleExample',
-          name: 'SimpleExample',
-          meta: {
-            title: "简单示例"
-          }
-        },
-        {
-          path: '/Model',
           name: 'Model',
           meta: {
             title: "模型"
           }
         },
         {
-          path: '/SkyBoxView',
-          name: 'SkyBoxView',
+          path: '/home',
+          name: 'home',
           meta: {
-            title: "天空盒"
-          }
-        }, {
-          path: '/VideoTextureView',
-          name: 'VideoTextureView',
-          meta: {
-            title: "视频贴图"
-          }
-        },
-        {
-          path: '/InfoDialogView',
-          name: 'InfoDialogView',
-          meta: {
-            title: "信息弹框"
-          }
-        },
-        {
-          path: '/EffectComposerView',
-          name: 'EffectComposerView',
-          meta: {
-            title: "后期处理"
+            title: "首页"
           }
         },
         {
@@ -78,6 +44,42 @@ export default {
           name: 'Test',
           meta: {
             title: "测试"
+          }
+        },
+        {
+          path: '/InfoDialogView',
+          name: 'InfoDialogView',
+          meta: {
+            title: "信息弹框"
+          }
+        },
+        {
+          path: '/SimpleExample',
+          name: 'SimpleExample',
+          meta: {
+            title: "简单示例"
+          }
+        },
+
+        {
+          path: '/SkyBoxView',
+          name: 'SkyBoxView',
+          meta: {
+            title: "天空盒"
+          }
+        }, {
+          path: '/VideoTextureView',
+          name: 'VideoTextureView',
+          meta: {
+            title: "视频贴图"
+          }
+        },
+
+        {
+          path: '/EffectComposerView',
+          name: 'EffectComposerView',
+          meta: {
+            title: "后期处理"
           }
         },
         {
