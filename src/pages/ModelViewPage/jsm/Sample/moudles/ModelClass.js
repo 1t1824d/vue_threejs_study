@@ -433,7 +433,7 @@ class ModelClass {
                 side: THREE.DoubleSide
             });
             let mesh = new THREE.Mesh(geometry, material);
-            mesh.position.x= -230;
+            mesh.position.x= 0;
             this.ParameterConfig.scene.add(mesh);
             //three.js 使用canvas加载图片作为模型的纹理贴图 https://blog.csdn.net/yinge0508/article/details/123090525
     }
